@@ -3,11 +3,14 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const { dbConnection } = require("./config/dbConnection");
 const port = 5000; // Port
 
 app.use(cors()); // The cors middleware
 app.use(express.json());
 app.use(cookieParser()); // Cookie parser 
+
+dbConnection() // Connect the database
 
 // Create the server using port number
 app.listen(port, () => {
