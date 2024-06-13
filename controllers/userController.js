@@ -270,3 +270,33 @@ const updateUserProfile = async (req, res) => {
     });
   }
 };
+// Forget password
+const forgotPassword = async (req, res) => {
+  try {
+    // Get data from req.body
+    const { email, password } = req.body;
+    // Check if present the email
+    if (!email || !password) {
+      return res.status(401).json({ message: "Fileds are required" });
+    }
+    // Check the user exist or not
+    const isUserExist = await User.findOne({ email });
+    if (!isUserExist) {
+      return res.status(401).json({ message: "The user not not found" });
+    }
+    // Hash the new password
+    const saltRounds = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Update the user's password
+    isUserExist.password = hashedPassword;
+    // Save the updated user data
+    await isUserExist.save();
+    return res.status(200).json({
+      message: "Password has been updated successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error while updating password", error: error.message });
+  }
+};
