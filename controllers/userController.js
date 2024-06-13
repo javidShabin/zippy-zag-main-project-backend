@@ -324,3 +324,34 @@ const deleteUser = async (req, res) => {
     });
   }
 };
+// Check user
+const checkUser = async (req, res) => {
+  try {
+    // Get user from req.user
+    const user = req.user;
+    console.log(user);
+    // Check user authorizes or not
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "user not autherised" });
+    }
+    // If user authorized
+    res.json({ success: true, message: "user autherised" });
+  } catch (error) {
+    res.status(401).json(error);
+  }
+};
+
+module.exports = {
+  userRegistration,
+  verifyOtpAndCreateUser,
+  userLogin,
+  getAllUsers,
+  userLogOut,
+  userProfile,
+  updateUserProfile,
+  forgotPassword,
+  deleteUser,
+  checkUser,
+};
