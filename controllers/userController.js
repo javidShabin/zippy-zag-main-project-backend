@@ -300,3 +300,27 @@ const forgotPassword = async (req, res) => {
       .json({ message: "Error while updating password", error: error.message });
   }
 };
+// Delete user
+const deleteUser = async (req, res) => {
+  try {
+    // Extrat user id form request params
+    const { id } = req.params;
+    // Use findByIdAndDelete to remove the user
+    const deleteUser = await User.findByIdAndDelete(id);
+    // If user not found, return an error
+    if (!deleteUser) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Error deleting user",
+      error: error.message,
+    });
+  }
+};
