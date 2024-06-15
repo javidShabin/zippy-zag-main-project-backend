@@ -82,7 +82,7 @@ const loginAdmin = async (req, res) => {
     // Pass token as cookie the token will expire in one hour
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
     });
     res.status(201).json({ success: true, message: "Admin logged in" });
   } catch (error) {
@@ -94,7 +94,7 @@ const logoutAdmin = async (req, res) => {
   try {
     res.clearCookie("adminToken", {
       httpOnly: true,
-      secure: false,
+      secure: true,
     });
     res.json({ success: true, message: "admin logged out" });
   } catch (error) {
