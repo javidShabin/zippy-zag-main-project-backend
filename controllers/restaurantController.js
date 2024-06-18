@@ -65,3 +65,55 @@ const createRestaurant = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Update restaurant
+const updateRestautant = async (req, res) => {
+  try {
+    // Get resuarant id
+    const restaurantId = req.params.id;
+    // Get datas from req.body
+    const { rating, name, location, cuisine, isOpen } = req.body;
+    // Store update data in a variable
+    const updateData = { rating, name, location, cuisine, isOpen };
+    // Declare a emty variable
+    let uploadResult;
+    // Add image file and update the image
+    if (req.file) {
+      try {
+        uploadResult = await cloudinaryInstance.uploader.upload(req.file.path);
+        // Assign the uploaded image URL to the user's image field
+        updateData.image = uploadResult.secure_url;
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: "File upload failed",
+          error: uploadError.message,
+        });
+      }
+    }
+    // Update restaurant
+    const updateRestaurant = await Restaurant.findByIdAndUpdate(
+      restaurantId,
+      updateData,
+      {
+        new: true,
+      }
+    );
+    if (!updateRestaurant) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Restaurant not found" });
+    }
+    // Send response
+    res.json({
+      success: true,
+      message: "Update restaurant successfully",
+      data: updateRestaurant,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Error updateing profile",
+      error: error.message,
+    });
+  }
+};
