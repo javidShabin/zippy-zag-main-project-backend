@@ -143,3 +143,10 @@ const deleteRestaurant = async (req, res) => {
     });
   }
 };
+module.exports = {
+  getAllRestaurants,
+  getRestautantById,
+  createRestaurant,
+  updateRestautant,
+  deleteRestaurant,
+};
