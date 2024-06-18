@@ -117,3 +117,29 @@ const updateRestautant = async (req, res) => {
     });
   }
 };
+// Delete restaurant
+const deleteRestaurant = async (req, res) => {
+  try {
+    // Get id from request params
+    const restaurantId = req.params.id;
+
+    // Find and delete restaurant using the id
+    const deletedRestaurant = await Restaurant.findByIdAndDelete(restaurantId);
+
+    if (!deletedRestaurant) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Restaurant not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Restaurant deleted successfully" });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting restaurant",
+      error: error.message,
+    });
+  }
+};
