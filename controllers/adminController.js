@@ -1,6 +1,7 @@
 const { Admin } = require("../models/adminModel");
 const bcrypt = require("bcrypt");
-const { generateToken } = require("../utils/token");
+const { generateAdminToken } = require("../utils/token");
+
 
 // Register admin
 const registerAdmin = async (req, res) => {
@@ -28,13 +29,13 @@ const registerAdmin = async (req, res) => {
     await newAdmin.save();
 
     // Generate a token
-    const token = generateToken({
+    const token = generateAdminToken({
       _id: newAdmin._id,
       email: newAdmin.email,
-      role: "customer",
+      role: "admin",
     });
     // Pass the token as cookie
-    res.cookie("token", token, {
+    res.cookie("adminToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
@@ -78,9 +79,9 @@ const loginAdmin = async (req, res) => {
         .json({ success: false, message: "Unatherised access" });
     }
     // Generate token
-    const token = generateToken(isAdminExist._id);
+    const token = generateAdminToken(isAdminExist._id);
     // Pass token as cookie the token will expire in one hour
-    res.cookie("token", token, {
+    res.cookie("adminToken", token, {
       httpOnly: true,
       secure: false,
     });
@@ -92,7 +93,7 @@ const loginAdmin = async (req, res) => {
 // Logout admin
 const logoutAdmin = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("adminToken", {
       httpOnly: true,
       secure: false,
     });
