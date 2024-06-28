@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { TempUser } = require("../models/tembUserModel");
 const { cloudinaryInstance } = require("../config/cloudineryConfig");
-const { generateToken } = require("../utils/token");
+const { generateUserToken } = require("../utils/token");
 
 // Register user
 const userRegistration = async (req, res) => {
@@ -111,13 +111,13 @@ const verifyOtpAndCreateUser = async (req, res) => {
     await newUser.save();
 
     // Generate a token
-    const token = generateToken({
+    const token = generateUserToken({
       _id: newUser._id,
       email: newUser.email,
-      role: "customer",
+      role: "user",
     });
     // Set token as cookie
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
@@ -163,9 +163,9 @@ const userLogin = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(isUserExist._id);
+    const token = generateUserToken(isUserExist._id);
     // Pass token as cookie the token will expire in one hour
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
@@ -187,7 +187,7 @@ const getAllUsers = async (req, res) => {
 // Logout user
 const userLogOut = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("userToken", {
       httpOnly: true,
       secure: true,
       sameSite: "none",

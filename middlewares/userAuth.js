@@ -3,15 +3,15 @@ const jwt = require("jsonwebtoken");
 const userAuth = (req, res, next) => {
   try {
     // Get token from cookies
-    const { token } = req.cookies;
+    const { userToken } = req.cookies;
     // Check have any token
-    if (!token) {
+    if (!userToken) {
       return res
         .status(401)
         .json({ success: false, messgae: "User not authorized" });
     }
     // If have toke verify the token
-    const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const verifyToken = jwt.verify(userToken, process.env.JWT_SECRET_KEY);
     if (!verifyToken) {
       return res
         .status(401)
