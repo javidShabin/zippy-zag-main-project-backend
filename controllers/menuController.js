@@ -68,3 +68,22 @@ const getMenusByCategory = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+const searchMenuByName = async (req, res) => {
+  try {
+    const { restaurantId } = req.params; // Destructure restaurantId from req.params
+    const { name } = req.query; // Destructure name from req.query
+    // Find the items using name
+    const menus = await Menu.find({
+      restaurantId,
+      name: { $regex: name, $options: "i" }, // case-insensitive search
+    });
+    // Check the item have in items
+    if (menus.length === 0) {
+      return res.status(401).json({ message: "The category not found" });
+    }
+    // Have the items send the response
+    res.status(200).json({ success: true, menus });
+  } catch (error) {+
+    res.status(500).json(error)
+  }
+};
