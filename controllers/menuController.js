@@ -125,3 +125,13 @@ const updateMenu = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// Delete a menu item
+const deleteMenu = async (req, res) => {
+  try {
+    const { menuId } = req.params; // Destructur menu id from request params
+    await Menu.findByIdAndDelete(menuId); // Find the menu item and delete using id
+    res.status(200).json({ success: true, message: "Menu item deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
