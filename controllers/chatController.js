@@ -29,7 +29,6 @@ const sendMessage = async (req, res) => {
     res.status(201).json({
       success: true,
       data: newMessage,
-      message: "Message sent successfully",
     });
   } catch (error) {
     console.error("Error sending message:", error);
