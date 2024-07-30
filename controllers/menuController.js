@@ -135,3 +135,12 @@ const deleteMenu = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+module.exports = {
+  createMenuItem,
+  getMenuforRestaurant,
+  getMenusByCategory,
+  searchMenuByName,
+  filterMenusByPrice,
+  updateMenu,
+  deleteMenu,
+};
