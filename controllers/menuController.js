@@ -36,3 +36,19 @@ const createMenuItem = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// Get the menu for a restaurant
+const getMenuforRestaurant = async (req, res) => {
+  try {
+    // Get the restaurant id from req.params
+    const { restaurantId } = req.params;
+    // Find the menus using restaurant id
+    const menus = await Menu.find({ restaurantId });
+    if (!menus) {
+      return res.status(401).json({ message: "Menus not found" });
+    }
+    // Else send the menu items as resonse
+    res.status(200).json({ success: true, menus });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
