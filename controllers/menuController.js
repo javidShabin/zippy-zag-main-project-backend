@@ -83,7 +83,27 @@ const searchMenuByName = async (req, res) => {
     }
     // Have the items send the response
     res.status(200).json({ success: true, menus });
-  } catch (error) {+
-    res.status(500).json(error)
+  } catch (error) {
+    +res.status(500).json(error);
+  }
+};
+// Filter menu by price
+const filterMenusByPrice = async (req, res) => {
+  try {
+    const { restaurantId } = req.params; // Destructure restaurantId from req.params
+    const { minPrice, maxPrice } = req.query; // Destructure minimum and maximum price from req.query
+    // Find the item using price
+    const menus = await Menu.find({
+      restaurantId,
+      price: { $gte: minPrice || 0, $lte: maxPrice || Infinity },
+    });
+    // Check the item in the pricerange
+    if (menus.length === 0) {
+      return res.status(401).json({ message: "The category not found" });
+    }
+    // Send the respone have any items
+    res.status(200).json({ success: true, menus });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };
