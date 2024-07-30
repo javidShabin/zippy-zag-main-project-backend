@@ -107,3 +107,21 @@ const filterMenusByPrice = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// Update a menu item
+const updateMenu = async (req, res) => {
+  try {
+    const { menuId } = req.params; // Destructure menu id from peq.params
+    const updates = req.body; // Get updated data from req.body
+    // Find the menu and update using menu id
+    const updatedMenu = await Menu.findByIdAndUpdate(menuId, updates, {
+      new: true,
+    });
+    if (!updatedMenu) {
+      return res.status(404).json({ message: "Menu item not found" });
+    }
+    // Return the updated date as a response
+    res.status(200).json({ success: true, updatedMenu });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
