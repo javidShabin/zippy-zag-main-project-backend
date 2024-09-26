@@ -1,4 +1,5 @@
 const { cloudinaryInstance } = require("../config/cloudineryConfig");
+const { Menu } = require("../models/menuModel");
 const { Restaurant } = require("../models/restaurantModel");
 
 // Get all restaurants
@@ -26,6 +27,45 @@ const getRestautantById = async (req, res) => {
     res.status(200).json(restaurant);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+// Filter the restaurant by menu
+const getRestaurantByMenu = async (req, res) => {
+  try {
+    // Extract the menu item name from the route parameter
+    const { name } = req.params;
+
+    // If the menu item name is not provided, return a 400 error response
+    if (!name) {
+      return res.status(400).json({ message: "Menu item name is required" });
+    }
+
+    // Perform a case-insensitive search for the menu item name in the database
+    // Using regex to match menu items even with varying cases (e.g., 'Biriyani', 'biriyani')
+    const menus = await Menu.find({
+      name: { $regex: name, $options: "i" },
+    }).populate("restaurantId"); // Populating the restaurantId field to get complete restaurant details
+  
+
+    // If no matching menus are found, return a 404 error response
+    if (menus.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No restaurants found for the given menu item" });
+    }
+
+    // Extract unique restaurants from the populated menus using a Set to remove duplicates
+    // This will return only the unique restaurant details
+    const uniqueRestaurants = [
+      ...new Set(menus.map((menu) => menu.restaurantId)),
+    ];
+
+    // Return a 200 response with the unique restaurants found
+    res.status(200).json({ restaurants: uniqueRestaurants });
+  } catch (error) {
+    // In case of any error, log the error and return a 500 server error response
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 // Create restaurant
@@ -146,6 +186,7 @@ const deleteRestaurant = async (req, res) => {
 module.exports = {
   getAllRestaurants,
   getRestautantById,
+  getRestaurantByMenu,
   createRestaurant,
   updateRestautant,
   deleteRestaurant,
