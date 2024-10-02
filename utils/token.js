@@ -7,7 +7,7 @@ const generateUserToken = ({ _id, email, role }) => {
       {
         id: _id,
         email: email,
-        role: role,
+        role: role || "user",
       },
       process.env.JWT_SECRET_KEY
     );
@@ -23,7 +23,7 @@ const generateAdminToken = ({ _id, email, role }) => {
       {
         id: _id,
         email: email,
-        role: role,
+        role: role || "admin",
       },
       process.env.JWT_SECRET_KEY
     );
