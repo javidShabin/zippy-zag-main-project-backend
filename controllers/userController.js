@@ -1,8 +1,8 @@
 const { User } = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const { TempUser } = require("../models/tembUser");
-const { cloudinaryInstance } = require("../config/cloudinaryConfig");
+const { TempUser } = require("../models/tembUserModel");
+const { cloudinaryInstance } = require("../config/cloudineryConfig");
 const { generateToken } = require("../utils/token");
 
 // Register user
