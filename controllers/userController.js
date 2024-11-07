@@ -138,3 +138,49 @@ const verifyOtpAndCreateUser = async (req, res) => {
     });
   }
 };
+// Login user
+const userLogin = async (req, res) => {
+  try {
+    // Get datas from req.body
+    const { name, email, password } = req.body;
+    // Check if required fields are present
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    // Find the user using email
+    const isUserExist = await User.findOne({ email });
+
+    // If user not exist the response error
+    if (!isUserExist) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    // Compare the password of user
+    const passwordMatch = bcrypt.compareSync(password, isUserExist.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Unatherised access" });
+    }
+
+    // Generate token
+    const token = generateToken(isUserExist._id);
+    // Pass token as cookie the token will expire in one hour
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.status(201).json({ success: true, message: "User logged in" });
+  } catch (error) {
+    res.status(404).json({ message: "faild to user login" });
+  }
+};
+// Useres list
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(404).json({ message: "Server not responese..." });
+  }
+};
