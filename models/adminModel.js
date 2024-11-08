@@ -5,8 +5,7 @@ const adminSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String, required: true },
-  role: { type: String, enum: ["customer", "admin"], default: "customer" },
-  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
+  role: { type: String, enum: ["customer", "admin"], default: "admin" },
 });
 
 const Admin = mongoose.model("admin", adminSchema);
