@@ -126,10 +126,40 @@ const adminProfile = async (req, res) => {
 // Forget password
 const forgotAdminPassword = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get data from req.body
+    const { email, password } = req.body;
+    // Check if present the email
+    if (!email || !password) {
+      return res.status(401).json({ message: "Fileds are required" });
+    }
+    // Check the admin exist or not
+    const isAdminExist = await User.findOne({ email });
+    if (!isAdminExist) {
+      return res.status(401).json({ message: "The admin not not found" });
+    }
+    // Hash the new password
+    const saltRounds = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Update the admin's password
+    isAdminExist.password = hashedPassword;
+    // Save the updated user data
+    await isAdminExist.save();
+    return res.status(200).json({
+      message: "Password has been updated successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error while updating password", error: error.message });
+  }
 };
 // Edite profile
 const editeAdminProfile = async (req, res) => {
+  try {
+  } catch (error) {}
+};
+// Check admin
+const checkAdmin = async (req, res) => {
   try {
   } catch (error) {}
 };
