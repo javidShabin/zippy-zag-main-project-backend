@@ -108,7 +108,7 @@ const adminProfile = async (req, res) => {
     const { admin } = req;
     // Get needed admin data
     const adminData = await Admin.findOne({ _id: admin.id });
-    const { image, name, email, phone, _id } = userData;
+    const { image, name, email, phone, _id } = adminData;
     // Send the data as json response
     res.json({
       success: true,
