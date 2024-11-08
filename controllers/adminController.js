@@ -57,7 +57,7 @@ const loginAdmin = async (req, res) => {
     // Get values from req.body
     const { name, email, password } = req.body;
     // Check if required field are present
-    if (!email || !password) {
+    if (!name || !email || !password) {
       return res
         .status(400)
         .json({ success: false, message: "All fields are required" });
@@ -104,7 +104,24 @@ const logoutAdmin = async (req, res) => {
 // Admin profile
 const adminProfile = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get admin from request
+    const { admin } = req;
+    // Get needed admin data
+    const adminData = await Admin.findOne({ _id: admin.id });
+    const { image, name, email, phone, _id } = userData;
+    // Send the data as json response
+    res.json({
+      success: true,
+      message: "Admin profile",
+      image,
+      name,
+      email,
+      phone,
+      _id,
+    });
+  } catch (error) {
+    res.status(401).json(error);
+  }
 };
 // Forget password
 const forgotAdminPassword = async (req, res) => {
