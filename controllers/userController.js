@@ -329,7 +329,6 @@ const checkUser = async (req, res) => {
   try {
     // Get user from req.user
     const user = req.user;
-    console.log(user);
     // Check user authorizes or not
     if (!user) {
       return res

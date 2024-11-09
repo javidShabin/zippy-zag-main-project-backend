@@ -205,7 +205,19 @@ const editeAdminProfile = async (req, res) => {
 // Check admin
 const checkAdmin = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get admin from req.admin
+    const admin = req.admin;
+    // Check admin authorzed or not
+    if (!admin) {
+      return res
+        .status(401)
+        .json({ success: false, message: "admin not autherised" });
+    }
+    // If admin authorized
+    res.json({ success: true, message: "admin autherised" });
+  } catch (error) {
+    res.status(401).json(error);
+  }
 };
 
 module.exports = {
@@ -215,4 +227,5 @@ module.exports = {
   adminProfile,
   forgotAdminPassword,
   editeAdminProfile,
+  checkAdmin,
 };
