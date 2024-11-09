@@ -156,7 +156,51 @@ const forgotAdminPassword = async (req, res) => {
 // Edite profile
 const editeAdminProfile = async (req, res) => {
   try {
-  } catch (error) {}
+    // Get admin from request
+    const { admin } = req;
+    // Get datas from req.body
+    const { name, email, phone } = req.body;
+    // Store update in a variable
+    const updateData = { name, email, phone };
+    // Declare a variable
+    let uploadResult;
+    // Add image file and update the image
+    if (req.file) {
+      try {
+        uploadResult = await cloudinaryInstance.uploader.upload(req.file.path);
+        // Assign the uploaded image URL to the user's image field
+        updateData.image = uploadResult.secure_url;
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: "File upload failed",
+          error: uploadError.message,
+        });
+      }
+    }
+    // Update admin
+    const updateAdmin = await Admin.findByIdAndUpdate(admin.id, updateData, {
+      new: true,
+    });
+    // Check have any updated admin
+    if (!updateAdmin) {
+      return res
+        .status(404)
+        .json({ success: false, message: "admin not found" });
+    }
+    // Send response
+    res.json({
+      success: true,
+      message: "User profile updated successfully",
+      data: updateAdmin,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Error updating profile",
+      error: error.message,
+    });
+  }
 };
 // Check admin
 const checkAdmin = async (req, res) => {
