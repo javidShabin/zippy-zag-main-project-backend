@@ -149,7 +149,7 @@ const userLogin = async (req, res) => {
     }
     // Find the user using email
     const isUserExist = await User.findOne({ email });
-
+    console.log(isUserExist)
     // If user not exist the response error
     if (!isUserExist) {
       return res.status(401).json({ message: "User not found" });
