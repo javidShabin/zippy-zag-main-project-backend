@@ -18,7 +18,7 @@ const registerAdmin = async (req, res) => {
     // Check if the admin already exists
     const isAdminExist = await Admin.findOne({ email });
     if (isAdminExist) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(409).json({ message: "Admin already exists" });
     }
     // Hash the password using bcrypt
     const saltRounds = 10;
