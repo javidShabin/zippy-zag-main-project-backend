@@ -80,3 +80,21 @@ const loginSeller = async (req, res) => {
     res.status(404).json({ message: "faild to seller login" });
   }
 };
+// Seller logout
+const logoutSeller = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.json({ success: true, message: "Seller logged out" });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+// get all sellers
+const getSellersList = async (req, res) => {
+  try {
+    const sellers = await Seller.find({});
+    return res.status(200).json(sellers);
+  } catch (error) {
+    res.status(404).json({ message: "Server not responese..." });
+  }
+};
