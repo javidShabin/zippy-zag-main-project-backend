@@ -98,3 +98,10 @@ const getSellersList = async (req, res) => {
     res.status(404).json({ message: "Server not responese..." });
   }
 };
+
+module.exports = {
+    registerSeller,
+    loginSeller,
+    logoutSeller,
+    getSellersList
+}
