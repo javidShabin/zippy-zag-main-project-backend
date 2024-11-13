@@ -46,3 +46,37 @@ const registerSeller = async (req, res) => {
     res.status(404).json({ error });
   }
 };
+// Login seller
+const loginSeller = async (req, res) => {
+  try {
+    // Destructuring fields
+    const { email, password } = req.body;
+
+    // Check if required fields
+    if ((!email, !password)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
+    }
+    // check the user signed or not
+    const isSellerExist = await Seller.findOne({ email });
+    if (!isSellerExist) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Seller does not exist" });
+    }
+
+    // generate token
+    const token = generateToken(isSellerExist._id);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.ENVIRONMENT === "development" ? false : true,
+      maxAge: 1 * 60 * 60 * 1000,
+    });
+    // Pass the token as cookie
+    res.status(201).json({ success: true, message: "Seller logged in" });
+  } catch (error) {
+    res.status(404).json({ message: "faild to seller login" });
+  }
+};
