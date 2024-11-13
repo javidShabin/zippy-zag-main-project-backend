@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const sellerAuthentication = (req, res, next) => {
+const sellerAuth = (req, res, next) => {
   try {
     // Get token form req.cookies
     const { token } = req.cookies;
@@ -29,4 +29,4 @@ const sellerAuthentication = (req, res, next) => {
     });
   }
 };
-module.exports = { sellerAuthentication };
+module.exports = { sellerAuth };

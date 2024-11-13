@@ -9,7 +9,7 @@ router.post("/register", registerAdmin);
 router.post("/login", loginAdmin)
 router.post("/logout", logoutAdmin)
 router.get("/profile", adminAuth, adminProfile)
-router.put("/forgot-password", forgotAdminPassword)
+router.put("/forgot-password", adminAuth, forgotAdminPassword)
 router.put("/update-profile", adminAuth, upload.single("image"), editeAdminProfile)
 router.get("/check-admin", adminAuth, checkAdmin)
 
