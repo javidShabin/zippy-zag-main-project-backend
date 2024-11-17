@@ -50,3 +50,20 @@ const getAddress = async (req, res) => {
     res.status(200).json(addresses);
   } catch (error) {}
 };
+// delete address
+const deleteAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await Address.findByIdAndDelete(userId);
+    res.status(200).json({ message: "Address deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createAddress,
+  updateAddress,
+  getAddress,
+  deleteAddress,
+};
