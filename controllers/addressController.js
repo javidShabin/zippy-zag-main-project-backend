@@ -28,3 +28,25 @@ const createAddress = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+// update address
+const updateAddress = async (req, res) => {
+  try {
+    const addressId = req.params.id;
+    const updatedData = req.body;
+    const address = await Address.findByIdAndUpdate(addressId, updatedData, {
+      new: true,
+    });
+    res.status(200).json(address);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+// get address
+const getAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log(userId);
+    const addresses = await Address.find({ user: userId });
+    res.status(200).json(addresses);
+  } catch (error) {}
+};
