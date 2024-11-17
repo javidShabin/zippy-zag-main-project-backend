@@ -5,14 +5,16 @@ const { restaurantRouter } = require("./restaurantRouter");
 const { menuRouter } = require("./menuRouter");
 const { sellerRouter } = require("./selleRouter");
 const { cartRouter } = require("./cartRouters");
+const { addressRouter } = require("./addressRouter");
 
 const router = express.Router();
 
 router.use("/user", userRouter);
 router.use("/admin", adminRouter);
-router.use("/seller", sellerRouter)
+router.use("/seller", sellerRouter);
 router.use("/restaurant", restaurantRouter);
 router.use("/menu", menuRouter);
-router.use("/cart", cartRouter)
+router.use("/cart", cartRouter);
+router.use("/address", addressRouter);
 
 module.exports = { v1Router: router };
