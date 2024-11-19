@@ -77,9 +77,9 @@ const addItemToCart = async (req, res) => {
 // get cart
 const getCart = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const user = req.user.id;
 
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ user });
     if (!cart) {
       return res.status(404).json({ message: "Cart not found." });
     }
