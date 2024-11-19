@@ -33,3 +33,19 @@ const getChatHistory = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch chat history" });
   }
 };
+// Fetch a list of all users who have chatted with the admin
+const getUsersWithChats = async (req, res) => {
+    try {
+      // Fetch distinct users from the chat model
+      const usersWithChats = await Chat.distinct("user");
+  
+      // Optionally, get more details for each user (e.g., name, email)
+      const users = await User.find({ _id: { $in: usersWithChats } }).select(
+        "name email"
+      );
+  
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users with chats" });
+    }
+  };
