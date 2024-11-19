@@ -1,4 +1,5 @@
 const { Chat } = require("../models/chatModel");
+const { User } = require("../models/userModel");
 
 // Send a chat message (Admin or User)
 const sendMessage = async (req, res) => {

@@ -6,6 +6,7 @@ const { menuRouter } = require("./menuRouter");
 const { sellerRouter } = require("./selleRouter");
 const { cartRouter } = require("./cartRouters");
 const { addressRouter } = require("./addressRouter");
+const { chatRouter } = require("./chatRouter");
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use("/restaurant", restaurantRouter);
 router.use("/menu", menuRouter);
 router.use("/cart", cartRouter);
 router.use("/address", addressRouter);
+router.use("/chat", chatRouter)
 
 module.exports = { v1Router: router };
