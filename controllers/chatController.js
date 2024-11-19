@@ -65,5 +65,5 @@ module.exports = {
   sendMessage,
   getChatHistory,
   removeAllChats,
-  getUsersWithChats, // Add this method to get a list of users who have chatted
+  getUsersWithChats,
 };
