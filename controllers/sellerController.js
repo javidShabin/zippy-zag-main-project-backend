@@ -209,7 +209,7 @@ const editeSellerProfile = async (req, res) => {
     res.json({
       success: true,
       message: "Seller profile updated successfully",
-      data: updateAdmin,
+      data: updatedSeller,
     });
   } catch (error) {
     res.status(401).json({
