@@ -3,7 +3,6 @@ const sellerAuth = (req, res, next) => {
   try {
     // Get token form req.cookies
     const { token } = req.cookies;
-    console.log("get token", token);
     // Check have any token
     if (!token) {
       return res.status(401).json({

@@ -121,7 +121,7 @@ const sellerProfile = async (req, res) => {
     // Get seller from request
     const { seller } = req;
     // Get needed admin data
-    const sellerData = await Seller.findOne({ id: seller.id });
+    const sellerData = await Seller.findOne({ _id: seller.id });
     const { image, name, email, phone, _id } = sellerData;
     // Send the data json response
     res.json({
