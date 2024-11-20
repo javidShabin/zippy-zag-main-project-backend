@@ -1,34 +1,52 @@
 const { Chat } = require("../models/chatModel");
 const { User } = require("../models/userModel");
 
-// Send a chat message (Admin or User)
 const sendMessage = async (req, res) => {
   try {
     const { userId, message, sender } = req.body;
 
-    // Check if the sender is admin or user
+    // Validate inputs
+    if (!userId || !message || !sender) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    if (!["admin", "user"].includes(sender)) {
+      return res
+        .status(400)
+        .json({ error: "Sender must be 'admin' or 'user'" });
+    }
+
+    // Create new chat message
     const newMessage = new Chat({
       user: userId, // User to whom the message is being sent
       message,
-      sender, // 'admin' or 'user', depends on who is sending
+      sender, // 'admin' or 'user'
     });
 
+    // Save message to database
     await newMessage.save();
-    res.status(201).json(newMessage);
+
+    res.status(201).json({
+      success: true,
+      data: newMessage,
+      message: "Message sent successfully",
+    });
   } catch (error) {
+    console.error("Error sending message:", error);
     res.status(500).json({ error: "Failed to send message" });
   }
 };
+
 // Get chat history for a specific user (for admin)
 const getChatHistory = async (req, res) => {
   try {
     const { userId } = req.params;
-
+    console.log(userId);
     // Fetch all chat messages between the admin and the specific user
     const chatMessages = await Chat.find({ user: userId }).sort({
       createdAt: 1,
     });
-
+    console.log(chatMessages);
     res.status(200).json(chatMessages);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch chat history" });

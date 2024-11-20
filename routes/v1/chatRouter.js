@@ -3,8 +3,8 @@ const { sendMessage, getChatHistory, removeAllChats, getUsersWithChats } = requi
 const router = express.Router();
 
 router.post('/send', sendMessage);
-router.get('/:userId', getChatHistory);
-router.delete('/:userId', removeAllChats)
-router.get('/chatUser', getUsersWithChats)
+router.get('/getchat/:userId', getChatHistory);
+router.delete('/remove-chat/:userId', removeAllChats)
+router.get('/chatUser/:userId', getUsersWithChats)
 
 module.exports = { chatRouter: router };
