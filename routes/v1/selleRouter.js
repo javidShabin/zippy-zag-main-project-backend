@@ -1,16 +1,31 @@
-const express = require('express')
-const { registerSeller, loginSeller, logoutSeller, getSellersList } = require('../../controllers/sellerController')
-const { adminAuth } = require('../../middlewares/adminAuth')
-const { sellerAuth } = require('../../middlewares/sellerAuth')
-const router = express.Router()
+const express = require("express");
+const {
+  registerSeller,
+  loginSeller,
+  logoutSeller,
+  getSellersList,
+  sellerProfile,
+  forgotSellerPassword,
+  editeSellerProfile,
+  checkSeller,
+} = require("../../controllers/sellerController");
+const { adminAuth } = require("../../middlewares/adminAuth");
+const { sellerAuth } = require("../../middlewares/sellerAuth");
+const { upload } = require("../../middlewares/multer");
+const router = express.Router();
 
-// Register seller
-router.post('/register', registerSeller)
-// Login seller
-router.post('/login', loginSeller)
-// logout seller
-router.post('/logout', sellerAuth, logoutSeller)
-// get seller
-router.get('/allSellers' , adminAuth, getSellersList)
+router.post("/register", registerSeller);
+router.post("/login", loginSeller);
+router.post("/logout", logoutSeller);
+router.get("/allSellers", adminAuth, getSellersList);
+router.get("/profile", sellerAuth, sellerProfile);
+router.put("/forgot-password", sellerAuth, forgotSellerPassword);
+router.put(
+  "/update-profile",
+  sellerAuth,
+  upload.single("image"),
+  editeSellerProfile
+);
+router.get("/check-seller", sellerAuth, checkSeller);
 
-module.exports = {sellerRouter: router}
+module.exports = { sellerRouter: router };
