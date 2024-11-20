@@ -133,7 +133,7 @@ const forgotAdminPassword = async (req, res) => {
       return res.status(401).json({ message: "Fileds are required" });
     }
     // Check the admin exist or not
-    const isAdminExist = await User.findOne({ email });
+    const isAdminExist = await Admin.findOne({ email });
     if (!isAdminExist) {
       return res.status(401).json({ message: "The admin not not found" });
     }
