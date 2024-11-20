@@ -1,51 +1,68 @@
 const { Restaurant } = require("../models/restaurantModel");
 const { Seller } = require("../models/sellerModel");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../utils/token");
 
 // Seller registration
 const registerSeller = async (req, res) => {
   try {
-    // Destructur data from request body
-    const { email, ...rest } = req.body;
-    // get restaurant id
-    const restaurantId = rest.restaurantId;
-    // Find restuarant by id and check have any restaurant
+    // Destructure data from the request body
+    const { email, password, restaurantId, ...rest } = req.body;
+
+    // Validate input (can integrate Joi or express-validator here for cleaner validation)
+    if (!email || !password || !restaurantId) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Find restaurant by ID
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
-    // Check exist seller or not
-    const isExistSeller = await Seller.findOne({ email });
-    if (isExistSeller) {
+
+    // Check if seller already exists
+    const existingSeller = await Seller.findOne({ email });
+    if (existingSeller) {
       return res.status(400).json({ message: "Seller already exists" });
     }
-    // Hashing seller password
-    const saltRounds = 10;
-    const hashedPassword = bcrypt.hashSync(rest.password, saltRounds);
 
-    // Create a seller and save to database
+    // Hash the seller's password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create a new seller and save it to the database
     const newSeller = new Seller({
       email,
-      ...rest,
       password: hashedPassword,
       restaurant: restaurantId,
+      ...rest,
     });
     await newSeller.save();
-    // genetare token
+
+    // Generate a token
     const token = generateToken({
       _id: newSeller.id,
       email: newSeller.email,
       role: "seller",
     });
-    // pass the token as cookie
+
+    // Pass the token as a cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.ENVIRONMENT === "development" ? false : true,
+      secure: process.env.ENVIRONMENT === "production", // Default to secure in production
     });
-    res.status(201).json({ success: true, message: "create new seller" });
+
+    // Respond with success
+    res.status(201).json({
+      success: true,
+      message: "Seller registered successfully",
+    });
   } catch (error) {
-    res.status(404).json({ error });
+    console.error("Error registering seller:", error.message); // Log the error for debugging
+    res.status(500).json({ message: "Internal server error" });
   }
 };
+
 // Login seller
 const loginSeller = async (req, res) => {
   try {
@@ -205,7 +222,7 @@ const editeSellerProfile = async (req, res) => {
 const checkSeller = async (req, res) => {
   try {
     // Get seller from req.seller
-    const seller = req.seller;
+    const seller = req.seller
     // Check seller authorzed or not
     if (!seller) {
       return res
@@ -217,7 +234,7 @@ const checkSeller = async (req, res) => {
   } catch (error) {
     res.status(401).json(error);
   }
-};
+}
 
 module.exports = {
   registerSeller,
@@ -227,5 +244,5 @@ module.exports = {
   sellerProfile,
   forgotSellerPassword,
   editeSellerProfile,
-  checkSeller,
+  checkSeller
 };
