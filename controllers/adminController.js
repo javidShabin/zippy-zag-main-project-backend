@@ -191,7 +191,7 @@ const editeAdminProfile = async (req, res) => {
     // Send response
     res.json({
       success: true,
-      message: "User profile updated successfully",
+      message: "Admin profile updated successfully",
       data: updateAdmin,
     });
   } catch (error) {
