@@ -7,7 +7,12 @@ const { dbConnection } = require("./config/dbConnection");
 const { apiRouter } = require("./routes");
 const port = 5000; // Port
 
-app.use(cors()); // The cors middleware
+app.use(
+  cors({
+    credentials: true,
+    origin: true,
+  })
+); // The cors middleware
 app.use(express.json());
 app.use(cookieParser()); // Cookie parser
 

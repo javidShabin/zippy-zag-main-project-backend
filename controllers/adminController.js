@@ -36,8 +36,8 @@ const registerAdmin = async (req, res) => {
     // Pass the token as cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure to true in production
-      maxAge: 3600000, // 1 hour
+      secure: true,
+      sameSite: "none",
     });
     // Return a success response
     res.status(201).json({

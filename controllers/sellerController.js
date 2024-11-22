@@ -49,7 +49,8 @@ const registerSeller = async (req, res) => {
     // Pass the token as a cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.ENVIRONMENT === "production", // Default to secure in production
+      secure: true,
+      sameSite: "none",
     });
 
     // Respond with success
