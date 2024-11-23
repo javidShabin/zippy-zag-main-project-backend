@@ -149,7 +149,7 @@ const userLogin = async (req, res) => {
     }
     // Find the user using email
     const isUserExist = await User.findOne({ email });
-    console.log(isUserExist)
+    console.log(isUserExist);
     // If user not exist the response error
     if (!isUserExist) {
       return res.status(401).json({ message: "User not found" });
@@ -189,14 +189,20 @@ const userLogOut = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
     });
-    res.json({ success: true, message: "User logged out" });
+    return res
+      .status(200)
+      .json({ success: true, message: "User logged out successfully" });
   } catch (error) {
-    console.log(error);
+    console.error("Logout error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "An error occurred during logout" });
   }
 };
+
 // Get user profile
 const userProfile = async (req, res) => {
   try {

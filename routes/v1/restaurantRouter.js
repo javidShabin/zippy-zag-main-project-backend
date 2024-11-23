@@ -11,7 +11,7 @@ const {
 const router = express.Router();
 
 router.get("/all-restaurants", getAllRestaurants);
-router.get("/:id", getRestautantById);
+router.get("/rest-details/:id", getRestautantById);
 router.post("/create-restaurant", upload.single("image"), createRestaurant);
 router.put("/update-restaurant/:id", updateRestautant);
 router.delete("/delete-restaurant/:id", deleteRestaurant);
