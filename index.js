@@ -18,6 +18,10 @@ app.use(cookieParser()); // Cookie parser
 
 dbConnection(); // Connect the database
 
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
+
 app.use("/api", apiRouter); // The api router
 
 // Create the server using port number
