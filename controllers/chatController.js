@@ -41,7 +41,6 @@ const sendMessage = async (req, res) => {
 const getChatHistory = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log(userId);
     // Fetch all chat messages between the admin and the specific user
     const chatMessages = await Chat.find({ user: userId }).sort({
       createdAt: 1,

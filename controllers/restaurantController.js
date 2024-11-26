@@ -17,7 +17,7 @@ const getAllRestaurants = async (req, res) => {
 const getRestautantById = async (req, res) => {
   try {
     const restautantId = req.params.id;
-    console.log(restautantId);
+
     const restaurant = await Restaurant.findById(restautantId);
     // Check the resstauratn available in the id
     if (!restaurant) {
