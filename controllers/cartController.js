@@ -13,63 +13,58 @@ const addItemToCart = async (req, res) => {
       });
     }
 
-    // Find or create the user's cart
+    // Find the user's cart
     let cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
 
-    // Loop through items and add or update them in the cart
-    for (let { menuItem, quantity } of items) {
-      const itemIndex = cart.items.findIndex(
+    // Check if any item already exists in the cart
+    for (let { menuItem } of items) {
+      const itemExists = cart.items.some(
         (item) => item.menuItem.toString() === menuItem
       );
 
+      if (itemExists) {
+        return res.status(400).json({
+          message: `Item already in the cart.`,
+        });
+      }
+    }
+
+    // Loop through items and add them to the cart
+    for (let { menuItem, quantity } of items) {
       const menuItemDetails = await Menu.findById(menuItem);
+
       if (!menuItemDetails) {
         return res.status(404).json({
-          message: "Menu item not found",
+          message: `Menu item with ID ${menuItem} not found.`,
         });
       }
 
-      if (itemIndex > -1) {
-        // Update quantity if item already exists
-        cart.items[itemIndex].quantity += quantity;
-      } else {
-        // Add new item to cart
-        cart.items.push({
-          menuItem,
-          quantity,
-          image: menuItemDetails.image, // Include image here
-        });
-      }
+      cart.items.push({
+        menuItem,
+        quantity,
+        image: menuItemDetails.image,
+        price: menuItemDetails.price,
+        ItemName: menuItemDetails.name,
+      });
     }
 
-    let totalPrice = 0;
-    for (let item of cart.items) {
-      const menuItem = await Menu.findById(item.menuItem);
-      console.log(menuItem, "check");
-      if (menuItem) {
-        totalPrice += menuItem.price * item.quantity;
-        item.price = menuItem.price;
-        item.ItemName = menuItem.name; // Ensure ItemName is assigned before saving
-        item.image = menuItem.image; // Assign image if needed
-        console.log(item.price, "===price");
-      } else {
-        throw new Error("Menu item not found");
-      }
-    }
+    // Calculate total price
+    cart.totalPrice = cart.items.reduce((total, item) => {
+      return total + item.price * item.quantity;
+    }, 0);
 
-    cart.totalPrice = totalPrice;
-
-    // Save the cart with updated total price and ItemName for each item
+    // Save the updated cart
     await cart.save();
-    res.status(200).json(cart);
+
+    res.status(200).json({message: "Item added to cart", cart});
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      message: "An error occurred while adding item to cart.",
+      message: "An error occurred while adding items to the cart.",
       error: error.message,
     });
   }
