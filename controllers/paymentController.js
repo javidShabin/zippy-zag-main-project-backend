@@ -1,8 +1,9 @@
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const client_domain = process.env.CLIENT_DOMAIN;
 const makePayment = async () => {
   try {
     const { products } = req.body;
-
+console.log(products)
     // Ensure products array exists and has items
     if (!products || products.length === 0) {
       return res
