@@ -31,7 +31,7 @@ const registerAdmin = async (req, res) => {
     const token = generateAdminToken({
       _id: newAdmin._id,
       email: newAdmin.email,
-      role: "customer",
+      role: "admin",
     });
     // Pass the token as cookie
     res.cookie("adminToken", token, {
