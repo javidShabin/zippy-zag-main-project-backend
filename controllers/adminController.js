@@ -3,27 +3,33 @@ const bcrypt = require("bcrypt");
 const { generateAdminToken } = require("../utils/token");
 
 // Register admin
+// Register admin
 const registerAdmin = async (req, res) => {
   try {
-    // Get datas from req.body
-    const { email, password, conformPassword, ...rest } = req.body;
-    // Check if rerquired fields are present
-    if (!email || !password || !conformPassword) {
+    // Get data from req.body
+    const { email, password, confirmPassword, ...rest } = req.body;
+
+    // Check if required fields are present
+    if (!email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    // Check if password and confirm password match
-    if (password !== conformPassword) {
+
+    // Check if password and confirmPassword match
+    if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
+
     // Check if the admin already exists
     const isAdminExist = await Admin.findOne({ email });
     if (isAdminExist) {
       return res.status(409).json({ message: "Admin already exists" });
     }
+
     // Hash the password using bcrypt
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    // Create a new admin and save the to databse
+
+    // Create a new admin and save it to the database
     const newAdmin = new Admin({ email, ...rest, password: hashedPassword });
     await newAdmin.save();
 
@@ -33,12 +39,14 @@ const registerAdmin = async (req, res) => {
       email: newAdmin.email,
       role: "admin",
     });
-    // Pass the token as cookie
+
+    // Pass the token as a cookie
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
     });
+
     // Return a success response
     res.status(201).json({
       success: true,
@@ -48,59 +56,86 @@ const registerAdmin = async (req, res) => {
     console.error(error); // Log the error for debugging
     res
       .status(500)
-      .json({ message: "User creation failed", error: error.message });
+      .json({ message: "Admin creation failed", error: error.message });
   }
 };
+
 // Login admin
 const loginAdmin = async (req, res) => {
   try {
     // Get values from req.body
-    const { name, email, password } = req.body;
-    // Check if required field are present
-    if (!name || !email || !password) {
+    const { email, password } = req.body;
+
+    // Check if required fields are present
+    if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "All fields are required" });
+        .json({ success: false, message: "Email and password are required" });
     }
-    // Check the admin logined or not
+
+    // Check if the admin exists
     const isAdminExist = await Admin.findOne({ email });
     if (!isAdminExist) {
       return res
         .status(401)
-        .json({ success: false, message: "User does not exist" });
+        .json({ success: false, message: "Admin does not exist" });
     }
+
     // Compare password for login
     const passwordMatch = bcrypt.compareSync(password, isAdminExist.password);
-
     if (!passwordMatch) {
       return res
         .status(401)
-        .json({ success: false, message: "Unatherised access" });
+        .json({ success: false, message: "Unauthorized access" });
     }
+
     // Generate token
-    const token = generateAdminToken(isAdminExist._id);
-    // Pass token as cookie the token will expire in one hour
+    const token = generateAdminToken({
+      _id: isAdminExist._id,
+      email: isAdminExist.email,
+      role: "admin",
+    });
+
+    // Pass token as a cookie, token will expire in one hour
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: true,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
-    res.status(201).json({ success: true, message: "Admin logged in" });
+
+    // Send success response
+    res
+      .status(200)
+      .json({ success: true, message: "Admin logged in successfully" });
   } catch (error) {
-    res.status(404).json({ message: "faild to admin login" });
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ success: false, message: "Failed to log in admin" });
   }
 };
+
 // Logout admin
 const logoutAdmin = async (req, res) => {
   try {
+    // Clear the admin token cookie
     res.clearCookie("adminToken", {
       httpOnly: true,
       secure: true,
+      sameSite: "strict",
     });
-    res.json({ success: true, message: "admin logged out" });
+
+    // Send a success response
+    res
+      .status(200)
+      .json({ success: true, message: "Admin logged out successfully" });
   } catch (error) {
-    res.status(404).json({ message: "faild to user logout" });
+    console.error(error); // Log the error for debugging
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to log out admin" });
   }
 };
+
 // Admin profile
 const adminProfile = async (req, res) => {
   try {
@@ -207,16 +242,24 @@ const checkAdmin = async (req, res) => {
   try {
     // Get admin from req.admin
     const admin = req.admin;
-    // Check admin authorzed or not
+
+    // Check if admin is authorized
     if (!admin) {
       return res
         .status(401)
-        .json({ success: false, message: "admin not autherised" });
+        .json({ success: false, message: "Admin not authorized" });
     }
-    // If admin authorized
-    res.json({ success: true, message: "admin autherised" });
+
+    // If admin is authorized
+    res.status(200).json({ success: true, message: "Admin authorized" });
   } catch (error) {
-    res.status(401).json(error);
+    console.error(error); // Log the error for debugging
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An error occurred while verifying admin",
+      });
   }
 };
 
