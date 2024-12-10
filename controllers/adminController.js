@@ -92,7 +92,7 @@ const loginAdmin = async (req, res) => {
 // Logout admin
 const logoutAdmin = async (req, res) => {
   try {
-    res.clearCookie("adminToken", {
+    res.clearCookie("token", {
       httpOnly: true,
       secure: true,
     });
