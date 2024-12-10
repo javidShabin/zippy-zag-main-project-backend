@@ -55,47 +55,40 @@ const registerAdmin = async (req, res) => {
 const loginAdmin = async (req, res) => {
   try {
     // Get values from req.body
-    const { email, password } = req.body;
-
-    // Check if required fields are present
-    if (!email || !password) {
+    const { name, email, password } = req.body;
+    // Check if required field are present
+    if (!name || !email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Email and password are required" });
+        .json({ success: false, message: "All fields are required" });
     }
-
-    // Check if admin exists
-    const admin = await Admin.findOne({ email });
-    if (!admin) {
+    // Check the admin logined or not
+    const isAdminExist = await Admin.findOne({ email });
+    if (!isAdminExist) {
       return res
         .status(401)
-        .json({ success: false, message: "Admin does not exist" });
+        .json({ success: false, message: "User does not exist" });
     }
-
     // Compare password for login
-    const passwordMatch = bcrypt.compareSync(password, admin.password);
+    const passwordMatch = bcrypt.compareSync(password, isAdminExist.password);
+
     if (!passwordMatch) {
       return res
         .status(401)
-        .json({ success: false, message: "Unauthorized access" });
+        .json({ success: false, message: "Unatherised access" });
     }
-
     // Generate token
-    const token = generateAdminToken(admin._id);
-
-    // Pass token as a cookie; the token will expire in one hour
+    const token = generateAdminToken(isAdminExist._id);
+    // Pass token as cookie the token will expire in one hour
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: true
+      secure: false,
     });
-
-    res.status(200).json({ success: true, message: "Admin logged in" });
+    res.status(201).json({ success: true, message: "Admin logged in" });
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).json({ message: "Failed to log in admin" });
+    res.status(404).json({ message: "faild to admin login" });
   }
 };
-
 // Logout admin
 const logoutAdmin = async (req, res) => {
   try {
