@@ -2,7 +2,6 @@ const { Admin } = require("../models/adminModel");
 const bcrypt = require("bcrypt");
 const { generateAdminToken } = require("../utils/token");
 
-
 // Register admin
 const registerAdmin = async (req, res) => {
   try {
