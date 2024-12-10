@@ -125,14 +125,10 @@ const logoutAdmin = async (req, res) => {
     });
 
     // Send a success response
-    res
-      .status(200)
-      .json({ success: true, message: "Admin logged out successfully" });
+    res.status(200).json({ success: true, message: "Admin logged out successfully" });
   } catch (error) {
     console.error(error); // Log the error for debugging
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to log out admin" });
+    res.status(500).json({ success: false, message: "Failed to log out admin" });
   }
 };
 
@@ -240,26 +236,19 @@ const editeAdminProfile = async (req, res) => {
 // Check admin
 const checkAdmin = async (req, res) => {
   try {
-    // Get admin from req.admin
+    // Get admin from req.admin (should be set in middleware)
     const admin = req.admin;
 
     // Check if admin is authorized
     if (!admin) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Admin not authorized" });
+      return res.status(401).json({ success: false, message: "Admin not authorized" });
     }
 
     // If admin is authorized
     res.status(200).json({ success: true, message: "Admin authorized" });
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while verifying admin",
-      });
+    console.error(error);
+    res.status(500).json({ success: false, message: "An error occurred while verifying admin" });
   }
 };
 
