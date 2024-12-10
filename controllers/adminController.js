@@ -90,22 +90,15 @@ const loginAdmin = async (req, res) => {
   }
 };
 // Logout admin
-// Logout admin
 const logoutAdmin = async (req, res) => {
   try {
-    // Clear the admin token cookie
     res.clearCookie("adminToken", {
       httpOnly: true,
-      secure: true,  // Use secure cookies in production with HTTPS
-      sameSite: "none",
+      secure: true,
     });
-
-    // Also clear any token stored in the localStorage or sessionStorage
-    // (This part is handled on the frontend)
-
-    res.json({ success: true, message: "Admin logged out" });
+    res.json({ success: true, message: "admin logged out" });
   } catch (error) {
-    res.status(404).json({ message: "Failed to log out" });
+    res.status(404).json({ message: "faild to user logout" });
   }
 };
 // Admin profile
@@ -209,21 +202,21 @@ const editeAdminProfile = async (req, res) => {
     });
   }
 };
-
 // Check admin
 const checkAdmin = async (req, res) => {
   try {
-    const admin = req.admin; // Get the admin from the middleware
-
-    // Check if admin is authorized
+    // Get admin from req.admin
+    const admin = req.admin;
+    // Check admin authorzed or not
     if (!admin) {
-      return res.status(401).json({ success: false, message: "Admin not authorized" });
+      return res
+        .status(401)
+        .json({ success: false, message: "admin not autherised" });
     }
-
-    // If admin is authorized
-    res.json({ success: true, message: "Admin authorized" });
+    // If admin authorized
+    res.json({ success: true, message: "admin autherised" });
   } catch (error) {
-    res.status(401).json({ message: "Error checking admin status", error: error.message });
+    res.status(401).json(error);
   }
 };
 
