@@ -55,40 +55,47 @@ const registerAdmin = async (req, res) => {
 const loginAdmin = async (req, res) => {
   try {
     // Get values from req.body
-    const { name, email, password } = req.body;
-    // Check if required field are present
-    if (!name || !email || !password) {
+    const { email, password } = req.body;
+
+    // Check if required fields are present
+    if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "All fields are required" });
+        .json({ success: false, message: "Email and password are required" });
     }
-    // Check the admin logined or not
-    const isAdminExist = await Admin.findOne({ email });
-    if (!isAdminExist) {
+
+    // Check if admin exists
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
       return res
         .status(401)
-        .json({ success: false, message: "User does not exist" });
+        .json({ success: false, message: "Admin does not exist" });
     }
-    // Compare password for login
-    const passwordMatch = bcrypt.compareSync(password, isAdminExist.password);
 
+    // Compare password for login
+    const passwordMatch = bcrypt.compareSync(password, admin.password);
     if (!passwordMatch) {
       return res
         .status(401)
-        .json({ success: false, message: "Unatherised access" });
+        .json({ success: false, message: "Unauthorized access" });
     }
+
     // Generate token
-    const token = generateAdminToken(isAdminExist._id);
-    // Pass token as cookie the token will expire in one hour
+    const token = generateAdminToken(admin._id);
+
+    // Pass token as a cookie; the token will expire in one hour
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: false,
+      secure: true
     });
-    res.status(201).json({ success: true, message: "Admin logged in" });
+
+    res.status(200).json({ success: true, message: "Admin logged in" });
   } catch (error) {
-    res.status(404).json({ message: "faild to admin login" });
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ message: "Failed to log in admin" });
   }
 };
+
 // Logout admin
 const logoutAdmin = async (req, res) => {
   try {
