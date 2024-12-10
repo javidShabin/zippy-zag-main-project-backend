@@ -29,10 +29,10 @@ const registerAdmin = async (req, res) => {
     await newAdmin.save();
 
     // Generate a token
-    const token = generateAdminToken({
+    const token = generatAdminToken({
       _id: newAdmin._id,
       email: newAdmin.email,
-      role: "admin",
+      role: "customer",
     });
     // Pass the token as cookie
     res.cookie("adminToken", token, {
@@ -79,7 +79,7 @@ const loginAdmin = async (req, res) => {
         .json({ success: false, message: "Unatherised access" });
     }
     // Generate token
-    const token = generateAdminToken(isAdminExist._id);
+    const token = generatAdminToken(isAdminExist._id);
     // Pass token as cookie the token will expire in one hour
     res.cookie("adminToken", token, {
       httpOnly: true,

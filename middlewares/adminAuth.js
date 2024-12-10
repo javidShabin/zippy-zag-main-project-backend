@@ -14,7 +14,6 @@ const adminAuth = (req, res, next) => {
     }
     // Token verification
     const verifyToken = jwt.verify(adminToken, process.env.JWT_SECRET_KEY);
-    console.log(verifyToken)
     if (!verifyToken) {
       return res.status(401).json({
         success: false,
