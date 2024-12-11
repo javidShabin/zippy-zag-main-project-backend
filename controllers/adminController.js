@@ -96,6 +96,7 @@ const logoutAdmin = async (req, res) => {
     res.clearCookie("adminToken", {
       httpOnly: true,
       secure: true,
+      sameSite: "none",
     });
     res.json({ success: true, message: "admin logged out" });
   } catch (error) {
