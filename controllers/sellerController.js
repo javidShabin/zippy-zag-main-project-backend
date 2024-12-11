@@ -1,7 +1,8 @@
 const { Restaurant } = require("../models/restaurantModel");
 const { Seller } = require("../models/sellerModel");
 const bcrypt = require("bcrypt");
-const { generateToken } = require("../utils/token");
+const { generateSellerToken } = require("../utils/token");
+
 
 // Seller registration
 const registerSeller = async (req, res) => {
@@ -40,14 +41,14 @@ const registerSeller = async (req, res) => {
     await newSeller.save();
 
     // Generate a token
-    const token = generateToken({
+    const token = generateSellerToken({
       _id: newSeller.id,
       email: newSeller.email,
       role: "seller",
     });
 
     // Pass the token as a cookie
-    res.cookie("token", token, {
+    res.cookie("sellerToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
@@ -85,9 +86,9 @@ const loginSeller = async (req, res) => {
     }
 
     // generate token
-    const token = generateToken(isSellerExist._id);
+    const token = generateSellerToken(isSellerExist._id);
 
-    res.cookie("token", token, {
+    res.cookie("sellerToken", token, {
       httpOnly: true,
       secure: process.env.ENVIRONMENT === "development" ? false : true,
       maxAge: 1 * 60 * 60 * 1000,
@@ -101,7 +102,7 @@ const loginSeller = async (req, res) => {
 // Seller logout
 const logoutSeller = async (req, res) => {
   try {
-    res.clearCookie("token");
+    res.clearCookie("sellerToken");
     res.json({ success: true, message: "Seller logged out" });
   } catch (error) {
     res.json({ error });

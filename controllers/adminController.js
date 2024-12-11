@@ -83,6 +83,7 @@ const loginAdmin = async (req, res) => {
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: true,
+      sameSite: "none",
     });
     res.status(201).json({ success: true, message: "Admin logged in" });
   } catch (error) {
@@ -92,7 +93,7 @@ const loginAdmin = async (req, res) => {
 // Logout admin
 const logoutAdmin = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("adminToken", {
       httpOnly: true,
       secure: true,
     });
