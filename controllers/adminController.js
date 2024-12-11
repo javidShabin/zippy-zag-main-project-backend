@@ -80,7 +80,7 @@ const loginAdmin = async (req, res) => {
     // Generate token
     const token = generateAdminToken(isAdminExist._id);
     // Pass token as cookie the token will expire in one hour
-    res.cookie("adminToken", token, {
+    res.cookie("adminToke", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
