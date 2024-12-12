@@ -1,3 +1,4 @@
+const { SellerRequest } = require("../models/requestModel");
 
 const createRequest = async (req, res) => {
   try {
