@@ -3,7 +3,6 @@ const { Seller } = require("../models/sellerModel");
 const bcrypt = require("bcrypt");
 const { generateSellerToken } = require("../utils/token");
 
-
 // Seller registration
 const registerSeller = async (req, res) => {
   try {
@@ -90,8 +89,8 @@ const loginSeller = async (req, res) => {
 
     res.cookie("sellerToken", token, {
       httpOnly: true,
-      secure: process.env.ENVIRONMENT === "development" ? false : true,
-      maxAge: 1 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "none",
     });
     // Pass the token as cookie
     res.status(201).json({ success: true, message: "Seller logged in" });
@@ -102,7 +101,11 @@ const loginSeller = async (req, res) => {
 // Seller logout
 const logoutSeller = async (req, res) => {
   try {
-    res.clearCookie("sellerToken");
+    res.clearCookie("sellerToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
     res.json({ success: true, message: "Seller logged out" });
   } catch (error) {
     res.json({ error });
@@ -224,7 +227,7 @@ const editeSellerProfile = async (req, res) => {
 const checkSeller = async (req, res) => {
   try {
     // Get seller from req.seller
-    const seller = req.seller
+    const seller = req.seller;
     // Check seller authorzed or not
     if (!seller) {
       return res
@@ -236,7 +239,7 @@ const checkSeller = async (req, res) => {
   } catch (error) {
     res.status(401).json(error);
   }
-}
+};
 
 module.exports = {
   registerSeller,
@@ -246,5 +249,5 @@ module.exports = {
   sellerProfile,
   forgotSellerPassword,
   editeSellerProfile,
-  checkSeller
+  checkSeller,
 };
