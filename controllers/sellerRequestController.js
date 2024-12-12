@@ -87,6 +87,7 @@ const removeRequest = async (req, res) => {
 module.exports = {
   createRequest,
   getAllRequests,
+  getRequestByUserId,
   getRequestById,
   updateRequst,
   removeRequest,
