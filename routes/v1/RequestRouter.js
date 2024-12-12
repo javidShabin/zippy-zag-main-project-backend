@@ -7,7 +7,6 @@ const {
 } = require("../../controllers/sellerRequestController");
 const { adminAuth } = require("../../middlewares/adminAuth");
 const { userAuth } = require("../../middlewares/userAuth");
-
 const router = express.Router();
 
 router.post("/send-request", userAuth, createRequest);

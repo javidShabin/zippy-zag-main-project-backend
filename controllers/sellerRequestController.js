@@ -57,8 +57,6 @@ const createRequest = async (req, res) => {
   }
 };
 
-module.exports = { createRequest };
-
 const getAllRequests = async (req, res) => {
   try {
   } catch (error) {}
