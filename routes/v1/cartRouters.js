@@ -5,6 +5,7 @@ const {
   getCart,
   updateCart,
   removeFromCart,
+  clearCart,
 } = require("../../controllers/cartController");
 
 const router = express.Router();
@@ -17,5 +18,7 @@ router.get("/getCart", userAuth, getCart);
 router.put("/update", userAuth, updateCart);
 // Remove cart
 router.delete("/remove", userAuth, removeFromCart);
+// CLear all item form cart
+router.delete("/clear", userAuth, clearCart)
 
 module.exports = { cartRouter: router };
