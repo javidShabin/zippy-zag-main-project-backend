@@ -57,36 +57,6 @@ const createRequest = async (req, res) => {
   }
 };
 
-const getAllRequests = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
-const getRequestByUserId = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
-const getRequestById = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
-const updateRequst = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
-const removeRequest = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
 module.exports = {
   createRequest,
-  getAllRequests,
-  getRequestByUserId,
-  getRequestById,
-  updateRequst,
-  removeRequest,
 };
