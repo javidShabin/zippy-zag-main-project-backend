@@ -1,16 +1,26 @@
+const { Order } = require("../models/orderModel");
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const client_domain = process.env.CLIENT_DOMAIN;
 
 const makePayment = async (req, res) => {
   try {
+    // Check for missing environment variables
     if (!process.env.STRIPE_SECRET_KEY || !process.env.CLIENT_DOMAIN) {
       throw new Error(
         "Missing environment variables: STRIPE_SECRET_KEY or CLIENT_DOMAIN"
       );
     }
+    // Extract data from the request body
+    const { products, userId, totalAmount, address } = req.body;
 
-    const { products } = req.body;
+    // Validate if address is provided
+    if (!address) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Address is required" });
+    }
 
+    // Check if the products array is provided and contains valid product data
     if (!products || products.length === 0) {
       return res
         .status(400)
@@ -29,6 +39,7 @@ const makePayment = async (req, res) => {
       });
     }
 
+    // Create line items for the Stripe checkout session
     const lineItems = products.map((product) => ({
       price_data: {
         currency: "inr",
@@ -36,30 +47,47 @@ const makePayment = async (req, res) => {
           name: product.ItemName,
           images: [product.image],
         },
-        unit_amount: Math.round(product.price * 100),
+        unit_amount: Math.round(product.price * 100), // Convert price to cents
       },
       quantity: product.quantity,
     }));
 
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${client_domain}/user/payment/success`,
-      cancel_url: `${client_domain}/user/payment/cancel`,
+      success_url: `${process.env.CLIENT_DOMAIN}/user/payment/success`,
+      cancel_url: `${process.env.CLIENT_DOMAIN}/user/payment/cancel`,
     });
 
+    // Create a new order in the database
+    const newOrder = new Order({
+      userId,
+      products,
+      totalAmount,
+      paymentStatus: "Pending",
+      paymentSessionId: session.id,
+      paymentMethod: "Stripe",
+      address,
+      createdAt: new Date(),
+    });
+
+    await newOrder.save();
+
+    // Respond with the session ID for Stripe checkout
     res.json({ success: true, sessionId: session.id });
   } catch (error) {
     console.error("Error creating checkout session:", error.message || error);
 
+    // Handle Stripe card errors
     if (error.type === "StripeCardError") {
-      return res.status(400).json({
-        success: false,
-        message: "Card was declined.",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Card was declined." });
     }
 
+    // Generic error handling
     res.status(500).json({
       success: false,
       message: error.message || "Failed to create checkout session",
