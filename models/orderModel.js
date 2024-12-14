@@ -23,6 +23,11 @@ const orderSchema = new mongoose.Schema(
     },
     paymentSessionId: { type: String, required: true },
     paymentMethod: { type: String, enum: ["Stripe"], required: true },
+    orderStatus: {
+      type: String,
+      enum: ["Processing", "Shipped", "Delivered", "Cancelled"], // Define possible statuses
+      default: "Processing", // Default status when order is created
+    },
     createdAt: { type: Date, default: Date.now },
     address: {
       name: { type: String, required: true },
