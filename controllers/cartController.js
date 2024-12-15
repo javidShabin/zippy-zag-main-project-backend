@@ -17,20 +17,8 @@ const addItemToCart = async (req, res) => {
     let cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
+      // Initialize a new cart if it doesn't exist
       cart = new Cart({ user: userId, items: [] });
-    }
-
-    // Check if any item already exists in the cart
-    for (let { menuItem } of items) {
-      const itemExists = cart.items.some(
-        (item) => item.menuItem.toString() === menuItem
-      );
-
-      if (itemExists) {
-        return res.status(400).json({
-          message: `Item already in the cart.`,
-        });
-      }
     }
 
     // Loop through items and add them to the cart
@@ -43,6 +31,22 @@ const addItemToCart = async (req, res) => {
         });
       }
 
+      const restaurantId = menuItemDetails.restaurantId;
+
+      // If the cart does not already have a restaurantId, set it (it should be the same for all items)
+      if (!cart.restaurantId) {
+        cart.restaurantId = restaurantId;
+      }
+
+      // Check if the item already exists in the cart
+      const itemExists = cart.items.some((item) => item.menuItem.toString() === menuItem);
+      if (itemExists) {
+        return res.status(400).json({
+          message: "Item already in the cart.",
+        });
+      }
+
+      // Add item to the cart
       cart.items.push({
         menuItem,
         quantity,
@@ -60,7 +64,7 @@ const addItemToCart = async (req, res) => {
     // Save the updated cart
     await cart.save();
 
-    res.status(200).json({message: "Item added to cart", cart});
+    res.status(200).json({ message: "Item added to cart", cart });
   } catch (error) {
     console.error(error);
     res.status(500).json({
