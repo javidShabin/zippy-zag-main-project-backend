@@ -1,26 +1,27 @@
 const { Order } = require("../models/orderModel");
 
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+// Backend: makePayment Controller
 const makePayment = async (req, res) => {
   try {
-    // Check for missing environment variables
     if (!process.env.STRIPE_SECRET_KEY || !process.env.CLIENT_DOMAIN) {
       throw new Error(
         "Missing environment variables: STRIPE_SECRET_KEY or CLIENT_DOMAIN"
       );
     }
-    // Extract data from the request body
-    const { products, userId, totalAmount, address } = req.body;
 
-    // Validate if address is provided
+    const { products, userId, totalAmount, address, restaurantId } = req.body;
+
+    console.log(restaurantId, "===details");
+
     if (!address) {
       return res
         .status(400)
         .json({ success: false, message: "Address is required" });
     }
 
-    // Check if the products array is provided and contains valid product data
     if (!products || products.length === 0) {
       return res
         .status(400)
@@ -39,7 +40,6 @@ const makePayment = async (req, res) => {
       });
     }
 
-    // Create line items for the Stripe checkout session
     const lineItems = products.map((product) => ({
       price_data: {
         currency: "inr",
@@ -47,12 +47,11 @@ const makePayment = async (req, res) => {
           name: product.ItemName,
           images: [product.image],
         },
-        unit_amount: Math.round(product.price * 100), // Convert price to cents
+        unit_amount: Math.round(product.price * 100),
       },
       quantity: product.quantity,
     }));
 
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -61,11 +60,11 @@ const makePayment = async (req, res) => {
       cancel_url: `${process.env.CLIENT_DOMAIN}/user/payment/cancel`,
     });
 
-    // Create a new order in the database
     const newOrder = new Order({
       userId,
       products,
       totalAmount,
+      restaurantId,
       paymentStatus: "Pending",
       paymentSessionId: session.id,
       paymentMethod: "Stripe",
@@ -75,19 +74,16 @@ const makePayment = async (req, res) => {
 
     await newOrder.save();
 
-    // Respond with the session ID for Stripe checkout
     res.json({ success: true, sessionId: session.id });
   } catch (error) {
     console.error("Error creating checkout session:", error.message || error);
 
-    // Handle Stripe card errors
     if (error.type === "StripeCardError") {
       return res
         .status(400)
         .json({ success: false, message: "Card was declined." });
     }
 
-    // Generic error handling
     res.status(500).json({
       success: false,
       message: error.message || "Failed to create checkout session",
@@ -95,6 +91,164 @@ const makePayment = async (req, res) => {
   }
 };
 
+const getOrderStatus = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming you have middleware that attaches user to req.user
+
+    // Fetch orders associated with the user
+    const orders = await Order.find({ userId });
+
+    console.log(orders);
+
+    if (!orders || orders.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No orders found" });
+    }
+
+    // Map through orders to retrieve relevant details
+    const orderStatuses = orders.map((order) => ({
+      orderStatus: order.orderStatus,
+      orderId: order._id,
+      restaurantId: order.restaurantId,
+      totalAmount: order.totalAmount,
+      paymentStatus: order.paymentStatus,
+      createdAt: order.createdAt,
+      address: order.address,
+      products: order.products,
+    }));
+
+    res.json({ success: true, orders: orderStatuses });
+  } catch (error) {
+    console.error("Error fetching order status:", error.message || error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch order status",
+    });
+  }
+};
+
+const updatePaymentStatus = async (req, res) => {
+  try {
+    const { orderId, paymentStatus } = req.body;
+
+    // Ensure orderId and paymentStatus are provided
+    if (!orderId || !paymentStatus) {
+      return res.status(400).json({
+        success: false,
+        message: "OrderId and paymentStatus are required.",
+      });
+    }
+
+    // Fetch the order by ID
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Update the order's payment status
+    order.paymentStatus = paymentStatus;
+
+    // Save the updated order
+    await order.save();
+
+    res.json({
+      success: true,
+      message: "Payment status updated successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Error updating payment status:", error.message || error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update payment status",
+    });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, orderStatus } = req.body;
+
+    // Ensure orderId and orderStatus are provided
+    if (!orderId || !orderStatus) {
+      return res.status(400).json({
+        success: false,
+        message: "OrderId and orderStatus are required.",
+      });
+    }
+
+    // Fetch the order by ID
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Update the order's status
+    order.orderStatus = orderStatus;
+
+    // Save the updated order
+    await order.save();
+
+    res.json({
+      success: true,
+      message: "Order status updated successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Error updating order status:", error.message || error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update order status",
+    });
+  }
+};
+
+const getOrdersByRestaurant = async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+
+    // Ensure restaurantId is provided
+    if (!restaurantId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "RestaurantId is required." });
+    }
+
+    // Fetch orders associated with the restaurantId
+    const orders = await Order.find({ restaurantId });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found for this restaurant",
+      });
+    }
+
+    // Send the list of orders
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.error(
+      "Error fetching orders by restaurant:",
+      error.message || error
+    );
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch orders",
+    });
+  }
+};
+
 module.exports = {
   makePayment,
+  getOrderStatus,
+  updatePaymentStatus,
+  updateOrderStatus,
+  getOrdersByRestaurant,
 };
