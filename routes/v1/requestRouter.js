@@ -7,6 +7,7 @@ const {
   getRequestsByUserId,
   updateRequestStatus,
   deleteRequest,
+  sendJoinLink,
 } = require("../../controllers/requestController");
 
 const router = express();
@@ -17,5 +18,6 @@ router.get("/getRequestById/:requestId", getRequestById);
 router.get("/getRequestByUserId", getRequestsByUserId);
 router.put("/update/status", updateRequestStatus);
 router.delete("/delete/:requestId", deleteRequest);
+router.post("/send-join-link", sendJoinLink)
 
 module.exports = { requestRouter: router };

@@ -1,4 +1,5 @@
 const { Request } = require("../models/requestModel"); // Adjust path as necessary
+const nodemailer = require("nodemailer");
 
 // Controller to create a new request
 const createRequest = async (req, res) => {
@@ -183,6 +184,66 @@ const deleteRequest = async (req, res) => {
   }
 };
 
+// Send join link to seller 
+const sendJoinLink = async (req, res) => {
+  const { email, restaurantId } = req.body; // Get email and restaurantId from the request body
+
+  // Validate input
+  if (!email || !restaurantId) {
+    return res.status(400).json({ message: "Email and Restaurant ID are required" });
+  }
+
+  // Basic email validation using regex
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+
+  try {
+    // Create a transporter for sending emails
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    // Verify the transporter connection
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error("SMTP connection error:", error);
+        return res.status(500).json({ message: "SMTP connection failed" });
+      }
+      console.log("SMTP transporter is ready to send emails.");
+    });
+
+    // Generate the join link (assuming you have a base URL and restaurant ID)
+    const joinLink = process.env.THE_BASE_URL
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Your Join Link and Restaurant ID",
+      text: `Hello,
+
+Here is your join link: ${joinLink}
+Restaurant ID: ${restaurantId}
+
+Thank you!`,
+    };
+
+    // Send the restaurant ID and join link via email
+    await transporter.sendMail(mailOptions);
+
+    // Send success response
+    res.json({ message: "Join Link and Restaurant ID sent successfully" });
+  } catch (error) {
+    console.error("Error sending email:", error); // Log the error for debugging
+    res.status(500).json({ message: "Failed to send join link and restaurant ID. Please try again." });
+  }
+}
+
 module.exports = {
   createRequest,
   getAllRequests,
@@ -190,4 +251,5 @@ module.exports = {
   getRequestsByUserId,
   updateRequestStatus,
   deleteRequest,
+  sendJoinLink
 };
