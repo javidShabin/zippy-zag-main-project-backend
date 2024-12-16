@@ -68,5 +68,28 @@ const getAllRequests = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
+// Get request by id
+const getRequestById = async (req, res) => {
+  try {
+    const { requestId } = req.params; // Get the requestId from URL parameters
 
-module.exports = { createRequest, getAllRequests };
+    // Find the request by its ID
+    const request = await Request.findById(requestId);
+
+    // If the request does not exist
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    // Return the found request
+    return res.status(200).json({
+      message: "Request fetched successfully",
+      request,
+    });
+  } catch (error) {
+    console.error("Error fetching request by ID:", error);
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+module.exports = { createRequest, getAllRequests, getRequestById };
