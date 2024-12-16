@@ -4,10 +4,18 @@ const { Request } = require("../models/requestModel"); // Adjust path as necessa
 const createRequest = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming `req.user` contains the authenticated user's data
-    const { cuisine, email, location, ownerName, phone, restaurantName } = req.body;
+    const { cuisine, email, location, ownerName, phone, restaurantName } =
+      req.body;
 
     // Check if all required fields are provided
-    if (!cuisine || !email || !location || !ownerName || !phone || !restaurantName) {
+    if (
+      !cuisine ||
+      !email ||
+      !location ||
+      !ownerName ||
+      !phone ||
+      !restaurantName
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -148,7 +156,38 @@ const updateRequestStatus = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
+// delete request
+const deleteRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params; // Assuming requestId is passed as a URL parameter
 
+    // Check if requestId is provided
+    if (!requestId) {
+      return res.status(400).json({ message: "Request ID is required" });
+    }
 
+    // Find and delete the request by its ID
+    const deletedRequest = await Request.findByIdAndDelete(requestId);
 
-module.exports = { createRequest, getAllRequests, getRequestById, getRequestsByUserId, updateRequestStatus };
+    if (!deletedRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    return res.status(200).json({
+      message: "Request deleted successfully",
+      request: deletedRequest,
+    });
+  } catch (error) {
+    console.error("Error deleting request:", error);
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+module.exports = {
+  createRequest,
+  getAllRequests,
+  getRequestById,
+  getRequestsByUserId,
+  updateRequestStatus,
+  deleteRequest,
+};
