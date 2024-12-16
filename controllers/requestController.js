@@ -114,6 +114,41 @@ const getRequestsByUserId = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
+// Update request statuds
+const updateRequestStatus = async (req, res) => {
+  try {
+    const { requestId, status } = req.body; // Assuming status is passed in the request body
+
+    // Check if both requestId and status are provided
+    if (!requestId || !status) {
+      return res
+        .status(400)
+        .json({ message: "Request ID and status are required" });
+    }
+
+    // Find the request by its ID
+    const request = await Request.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    // Update the status of the request
+    request.status = status;
+
+    // Save the updated request
+    const updatedRequest = await request.save();
+
+    return res.status(200).json({
+      message: "Request status updated successfully",
+      request: updatedRequest,
+    });
+  } catch (error) {
+    console.error("Error updating request status:", error);
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};
 
 
-module.exports = { createRequest, getAllRequests, getRequestById, getRequestsByUserId };
+
+module.exports = { createRequest, getAllRequests, getRequestById, getRequestsByUserId, updateRequestStatus };
