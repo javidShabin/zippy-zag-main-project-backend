@@ -10,7 +10,11 @@ const port = 5000; // Port
 app.use(
   cors({
     credentials: true,
-    origin: ["https://zippy-zag-main-project-frontend.vercel.app", "https://zippy-zag-main-admin-page.vercel.app"]
+    origin: [
+      "https://zippy-zag-main-project-frontend.vercel.app",
+      "https://zippy-zag-main-admin-page.vercel.app",
+      "https://zippy-zag-main-project-seller.vercel.app",
+    ],
   })
 ); // The cors middleware
 app.use(express.json());
