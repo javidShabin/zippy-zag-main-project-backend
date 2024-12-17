@@ -105,8 +105,12 @@ const getRequestsByUserId = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming `req.user` contains the authenticated user's data
 
+    console.log(userId, "===user")
+
     // Fetch requests by user ID
     const requests = await Request.find({ userId });
+
+    console.log(requests)
 
     if (!requests || requests.length === 0) {
       return res
