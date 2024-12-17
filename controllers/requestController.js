@@ -219,7 +219,7 @@ const sendJoinLink = async (req, res) => {
     });
 
     // Generate the join link (assuming you have a base URL and restaurant ID)
-    const joinLink = process.env.THE_BASE_URL
+    const joinLink = process.env.THE_BASE_URL;
 
     const mailOptions = {
       from: process.env.EMAIL,
