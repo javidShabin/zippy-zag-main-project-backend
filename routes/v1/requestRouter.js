@@ -15,9 +15,9 @@ const router = express();
 router.post("/create-request", userAuth, createRequest);
 router.get("/getAllRequest", getAllRequests);
 router.get("/getRequestById/:requestId", getRequestById);
-router.get("/getRequestByUserId", getRequestsByUserId);
+router.get("/getRequestByUserId", userAuth, getRequestsByUserId);
 router.put("/update/status", updateRequestStatus);
 router.delete("/delete/:requestId", deleteRequest);
-router.post("/send-join-link", sendJoinLink)
+router.post("/send-join-link", sendJoinLink);
 
 module.exports = { requestRouter: router };
