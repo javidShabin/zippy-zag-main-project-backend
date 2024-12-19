@@ -6,6 +6,7 @@ const {
   updatePaymentStatus,
   updateOrderStatus,
   getOrdersByRestaurant,
+  getOrderById,
 } = require("../../controllers/paymentController");
 const router = express.Router();
 
