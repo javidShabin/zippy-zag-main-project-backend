@@ -15,6 +15,6 @@ router.get("/session-status", userAuth, getOrderStatus);
 router.get("/orders/:orderId", getOrderById);
 router.put("/update-payment-status", updatePaymentStatus);
 router.put("/update-order-status", updateOrderStatus);
-router.get("/orderBy-restaurant/:restaurantId", getOrdersByRestaurant);
+router.get("/orderByRestaurant/:restaurantId", getOrdersByRestaurant);
 
 module.exports = { paymentRouter: router };
