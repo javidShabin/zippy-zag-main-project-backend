@@ -252,9 +252,12 @@ const getOrdersByRestaurant = async (req, res) => {
         .json({ success: false, message: "RestaurantId is required." });
     }
 
+    console.log("Fetching orders for restaurantId:", restaurantId);
+
     // Fetch orders associated with the restaurantId
     const orders = await Order.find({ restaurantId });
 
+    // If no orders are found
     if (!orders || orders.length === 0) {
       return res.status(404).json({
         success: false,
@@ -265,16 +268,14 @@ const getOrdersByRestaurant = async (req, res) => {
     // Send the list of orders
     res.json({ success: true, orders });
   } catch (error) {
-    console.error(
-      "Error fetching orders by restaurant:",
-      error.message || error
-    );
+    console.error("Error fetching orders by restaurant:", error.message || error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch orders",
     });
   }
 };
+
 
 module.exports = {
   makePayment,
