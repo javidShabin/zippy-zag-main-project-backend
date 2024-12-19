@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.post("/create-checkout-session", userAuth, makePayment);
 router.get("/session-status", userAuth, getOrderStatus);
+router.get("/orders/:orderId", getOrderById);
 router.put("/update-payment-status", updatePaymentStatus);
 router.put("/update-order-status", updateOrderStatus);
 router.get("/orderBy-restaurant/:restaurantId", getOrdersByRestaurant);

@@ -1,6 +1,5 @@
 const { Order } = require("../models/orderModel");
 
-
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Backend: makePayment Controller
@@ -128,6 +127,38 @@ const getOrderStatus = async (req, res) => {
   }
 };
 
+const getOrderById = async (req, res) => {
+  try {
+    const { orderId } = req.params; // Extract orderId from request parameters
+
+    // Validate that orderId is provided
+    if (!orderId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Order ID is required" });
+    }
+
+    // Fetch the order by ID
+    const order = await Order.findById(orderId);
+
+    // Check if the order exists
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Return the order details
+    res.json({ success: true, order });
+  } catch (error) {
+    console.error("Error fetching order by ID:", error.message || error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch order",
+    });
+  }
+};
+
 const updatePaymentStatus = async (req, res) => {
   try {
     const { orderId, paymentStatus } = req.body;
@@ -248,6 +279,7 @@ const getOrdersByRestaurant = async (req, res) => {
 module.exports = {
   makePayment,
   getOrderStatus,
+  getOrderById,
   updatePaymentStatus,
   updateOrderStatus,
   getOrdersByRestaurant,
