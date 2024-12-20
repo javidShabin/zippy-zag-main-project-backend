@@ -208,30 +208,22 @@ const clearCart = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Find the user's cart
-    const cart = await Cart.findOne({ user: userId });
+    // Find and delete the user's cart
+    const deletedCart = await Cart.findOneAndDelete({ user: userId });
 
-    if (!cart) {
+    if (!deletedCart) {
       return res.status(404).json({
         message: "Cart not found.",
       });
     }
 
-    // Clear the items and reset total price
-    cart.items = [];
-    cart.totalPrice = 0;
-
-    // Save the updated cart
-    await cart.save();
-
     res.status(200).json({
-      message: "Cart cleared successfully.",
-      cart,
+      message: "Cart deleted successfully.",
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      message: "An error occurred while clearing the cart.",
+      message: "An error occurred while deleting the cart.",
       error: error.message,
     });
   }
