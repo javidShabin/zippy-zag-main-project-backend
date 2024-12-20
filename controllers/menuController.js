@@ -128,10 +128,21 @@ const updateMenu = async (req, res) => {
 // Delete a menu item
 const deleteMenu = async (req, res) => {
   try {
-    const { menuId } = req.params; // Destructur menu id from request params
-    await Menu.findByIdAndDelete(menuId); // Find the menu item and delete using id
-    res.status(200).json({ success: true, message: "Menu item deleted" });
+    const { menuId } = req.params; // Destructure menu id from request params
+    
+    // Check if the menu exists
+    const menu = await Menu.findById(menuId);
+    if (!menu) {
+      return res.status(404).json({ success: false, message: "Menu item not found" });
+    }
+
+    // Delete the menu item
+    await Menu.findByIdAndDelete(menuId);
+
+    // Optionally, return the deleted menu
+    res.status(200).json({ success: true, message: "Menu item deleted", deletedMenu: menu });
   } catch (error) {
+    console.error(`Error deleting menu item: ${error.message}`);
     res.status(500).json({ success: false, error: error.message });
   }
 };
