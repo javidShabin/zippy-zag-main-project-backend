@@ -6,7 +6,6 @@ const { menuRouter } = require("./menuRouter");
 const { sellerRouter } = require("./selleRouter");
 const { cartRouter } = require("./cartRouters");
 const { addressRouter } = require("./addressRouter");
-const { chatRouter } = require("./chatRouter");
 const { paymentRouter } = require("./paymentRouter");
 const { requestRouter } = require("./requestRouter");
 
@@ -19,7 +18,6 @@ router.use("/restaurant", restaurantRouter);
 router.use("/menu", menuRouter);
 router.use("/cart", cartRouter);
 router.use("/address", addressRouter);
-router.use("/chat", chatRouter);
 router.use("/payment", paymentRouter);
 router.use("/request", requestRouter)
 
