@@ -8,6 +8,7 @@ const { cartRouter } = require("./cartRouters");
 const { addressRouter } = require("./addressRouter");
 const { paymentRouter } = require("./paymentRouter");
 const { requestRouter } = require("./requestRouter");
+const { chatRouter } = require("./chatRouter");
 
 const router = express.Router();
 
@@ -19,6 +20,6 @@ router.use("/menu", menuRouter);
 router.use("/cart", cartRouter);
 router.use("/address", addressRouter);
 router.use("/payment", paymentRouter);
-router.use("/request", requestRouter)
-
+router.use("/request", requestRouter);
+router.use("/chat", chatRouter);
 module.exports = { v1Router: router };
