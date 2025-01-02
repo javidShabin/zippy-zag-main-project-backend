@@ -69,6 +69,7 @@ const getUsersWithChats = async (req, res) => {
 // Remove all chats for a specific user
 const removeAllChats = async (req, res) => {
   try {
+    // get the user id form req.params
     const { userId } = req.params;
 
     await Chat.deleteMany({ user: userId });
