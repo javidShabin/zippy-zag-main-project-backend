@@ -157,6 +157,7 @@ const updateRestautant = async (req, res) => {
     });
   }
 };
+
 // Delete restaurant
 const deleteRestaurant = async (req, res) => {
   try {
