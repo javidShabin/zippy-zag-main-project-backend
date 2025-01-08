@@ -8,7 +8,7 @@ const { generateUserToken } = require("../utils/token");
 // Register user
 const userRegistration = async (req, res) => {
   try {
-    const { email, password, conformPassword, name, phone, ...rest } = req.body;
+    const { email, password, conformPassword, name, phone } = req.body;
 
     // Check if required fields are present
     if (!email || !password || !conformPassword || !name || !phone) {
@@ -33,8 +33,8 @@ const userRegistration = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
+        user: process.env.EMAIL, // Ensure this is set in your environment variables
+        pass: process.env.EMAIL_PASSWORD, // Ensure this is set in your environment variables
       },
     });
 
@@ -45,38 +45,55 @@ const userRegistration = async (req, res) => {
       text: `Your OTP is ${otp}. Please verify to complete your registration.`,
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+      return res.status(500).json({ message: "Failed to send OTP. Try again later." });
+    }
 
     // Hash the password
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    let hashedPassword;
+    try {
+      hashedPassword = await bcrypt.hash(password, saltRounds);
+    } catch (hashError) {
+      console.error("Error hashing password:", hashError);
+      return res.status(500).json({ message: "Failed to process password. Try again later." });
+    }
 
     // Save or update temporary user data with OTP
-    await TempUser.findOneAndUpdate(
-      { email },
-      {
-        email,
-        password: hashedPassword,
-        otp, // store OTP
-        otpExpiresAt: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
-        name, // Store name
-        phone, // Store phone
-      },
-      { upsert: true, new: true } // Create new or update existing
-    );
+    try {
+      await TempUser.findOneAndUpdate(
+        { email },
+        {
+          email,
+          password: hashedPassword,
+          otp,
+          otpExpiresAt: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
+          name,
+          phone,
+        },
+        { upsert: true, new: true }
+      );
+    } catch (dbError) {
+      console.error("Error saving to TempUser:", dbError);
+      return res.status(500).json({ message: "Failed to save user data. Try again later." });
+    }
 
     res.status(200).json({
       success: true,
       message: "OTP sent to your email. Please verify within 10 minutes.",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Unexpected error in userRegistration:", error);
     res.status(500).json({
-      message: "Registration failed",
+      message: "Internal server error",
       error: error.message,
     });
   }
 };
+
 // Otp verifying and create user
 const verifyOtpAndCreateUser = async (req, res) => {
   try {
